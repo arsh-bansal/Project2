@@ -18,13 +18,13 @@ app.use(cors());
 
 connectToDb();
 
-// Register routes
-app.use("/api", authRoutes);
-app.use("/api", salesRoutes);
-app.use("/api", applicantRoutes);
+// Register routes - change to use actual API endpoints not just /api prefix
+app.use("/", authRoutes);
+app.use("/", salesRoutes);
+app.use("/", applicantRoutes);
 
-app.listen(2006, async function () {
-  console.log("Server Started...");
+app.listen(2005, async function () {
+  console.log("Server Started on port 2005...");
 
   const adminExists = await User.findOne({ user: "admin" });
   if (!adminExists) {
