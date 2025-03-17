@@ -1,37 +1,51 @@
-import User from "../../models/User";
+import User from "./model.js";
 
 export const saveApplicant = async (req, res) => {
+  console.log("[APPLICANT] New applicant submission:", {
+    hasFile: !!req.files?.ppic,
+    body: req.body,
+    timestamp: new Date().toISOString(),
+  });
+
   if (req.files && req.files.ppic) {
     const uniqueFilename = `${Date.now()}_${req.files.ppic.name}`;
     const filepath = path.join(__dirname, "..", "uploads", uniqueFilename);
 
     try {
       await req.files.ppic.mv(filepath);
-      console.log("File uploaded successfully");
+      console.log("[APPLICANT] File uploaded successfully:", filepath);
       const filename = uniqueFilename;
 
       const user = await User.create(req.body);
       return res.json({ doc: user, status: true, msg: "saved" });
     } catch (err) {
-      console.error("File upload failed:", err);
-      return resp.json({ status: false, msg: "File upload failed" });
+      console.error("[APPLICANT] File upload failed:", err.message);
+      return res.json({ status: false, msg: "File upload failed" });
     }
   } else {
     console.log("No file uploaded");
+    return res.json({ status: false, msg: "No file uploaded" });
   }
 };
 
 export const getApplicant = async (req, resp) => {
+  console.log("[APPLICANT] Fetching all applicants");
   try {
     const documents = await User.find();
+    console.log("[APPLICANT] Found applicants:", documents.length);
     resp.status(200).json(documents);
   } catch (err) {
-    console.error("Error fetching data:", err.message);
+    console.error("[APPLICANT] Error fetching applicants:", err.message);
     resp.status(500).json({ error: err.message });
   }
 };
 
 export const updateApplicant = async (req, resp) => {
+  console.log("[APPLICANT] Update request:", {
+    uid: req.body.uid,
+    status: req.body.status,
+    timestamp: new Date().toISOString(),
+  });
   console.log("Received update request:", req.body);
   const { uid, status } = req.body;
 
@@ -59,6 +73,10 @@ export const updateApplicant = async (req, resp) => {
         .json({ status: false, msg: "Applicant not found" });
     }
 
+    console.log("[APPLICANT] Update successful:", {
+      uid: updatedDoc.uid,
+      newStatus: updatedDoc.status,
+    });
     console.log("Successfully updated document:", updatedDoc);
     resp.status(200).json({
       status: true,
@@ -66,6 +84,7 @@ export const updateApplicant = async (req, resp) => {
       doc: updatedDoc,
     });
   } catch (err) {
+    console.error("[APPLICANT] Update failed:", err.message);
     console.error("Error updating status:", err);
     resp.status(500).json({ status: false, msg: err.message });
   }

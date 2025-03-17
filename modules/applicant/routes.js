@@ -1,10 +1,6 @@
 import { Router } from "express";
 const router = Router();
-import {
-  saveApplicant,
-  getApplicant,
-  updateApplicant,
-} from "./applicant.controller";
+import { saveApplicant, getApplicant, updateApplicant } from "./controller.js";
 
 router.post("/applicant", saveApplicant);
 router.get("/applicant", getApplicant);
